@@ -2,22 +2,22 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <termios.h>
+#include <stdlib.h>
 
-// void enableRawMode() {
-//     struct termios raw;
-//     tcgetattr(STDIN_FILENO, &raw);
-//     raw.c_lflag = raw.c_lflag & ~(ECHO);
-//     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-// }
-void setRawMode(int enable) {
-    struct termios raw;
-    tcgetattr(STDIN_FILENO, &raw);
-    raw.c_lflag = enable ? raw.c_lflag | ECHO : raw.c_lflag & ~ECHO;
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw); 
+// To return original terminal setting for user when program exit or just don't need to visable input from keyboard.
+struct termios original_termios;
+void disableRawMode() {
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &original_termios);
 }
-
+void enableRawMode() {
+    tcgetattr(STDIN_FILENO, &original_termios);
+    atexit(disableRawMode);
+    struct termios raw = original_termios;
+    raw.c_lflag &= ~(ECHO);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+}
 void readKeyPress() {
-    setRawMode(0);
+    enableRawMode();
     char c;
     while(read(STDIN_FILENO, &c, 1) == 1 && c != CTRL_Q ) {
         testInput(c);
