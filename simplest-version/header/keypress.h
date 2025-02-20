@@ -23,12 +23,14 @@ typedef enum {
     RIGHT_ARROW = 39,
     DOWN_ARROW = 40,
 } ControlKey;
+
+/***    Initialization functions --> Config Terminal *  **/
 /*
-    For more details, read at docs/termios.md
+    For more details, read at ../docs/termios.md
 
     lib: <termios.h>
     Turn off echoing in terminal. 
-    #define ECHO 0000010 -> set ECHO bit = 0 in c_lflag
+    #define ECHO -> set ECHO bit = 0 in c_lflag
     - When input some character from keyboard, it won't show on terminal, 
         but after press Enter, it will show on terminal
     - We can use this function to make input password from user is invisable
@@ -56,8 +58,34 @@ typedef enum {
     - IEXTEN enable implementation-defined input processing like ctrl_V, ctrl_O 
     - ~IEXTEN giving the program more control over the input, ctrlV/ctrl_O no longer works, enter as normal character
     
+    Fix Ctrl_M <and Ctrl_J>
+    - Ctrl_M is equal 10, Ctrl_J and Enter are both also equal 10 
+    - Target to set Ctrl_M = 13
+    - Set to c_iflag
+    - ICRNL -> Map CR to NL on input. CR is carriage return and NL is new line
+    - Turn off ICRNL that make Ctrl_M = 13 and Enter is also equal 13, but Ctrl_J = 10
+
+    Turn off all output processing
+    - Set to c_oflag with ~OPOST
+    - A newline '\n' = 10 translated to '\r\n'
+    - So, if want to make a new line, take '\r\n'
+
+    Turn off Breaking input like ctrl_c by set to c_iflag = ~BRKINT (I know, we have done it, but I think we need to make sure that program follow what we want)
+    Turn off parity check by set to c_iflag = ~INPCK
+    Preserve all 8 bits of the character by set to c_iflag = ~ISTRIP
+
+    Set to control mode c_cflag |= CS8 -> set size of data is 8 bit
+
+    Currently, read() will wait indefinitely for input from the keyboard before it returns. 
+        What if we want to do something like animate something on the screen while waiting for user input? 
+        We can set a timeout, so that read() returns if it doesn’t get any input for a certain amount of time.
+    - Set VMIN and VTIME to c_cc[type] to control special event
+    - VMIN = 0 -> No need to enter any characters first to start reading
+    - VTIME = 1 -> 1 milisecond to exit read() when no characters are entered
+
     Set atext(func) to call disableRawMode when exit program
 */
+struct termios setFlagsForRawMode(struct termios raw);
 void enableRawMode();
 /*
     lib: include <stdlib.h> for atexit(func)
@@ -78,10 +106,13 @@ void disableRawMode();
     - enableRawMode() to config input from keyboard to terminal, 
         like exit by ctr+Q, save by ctr+S, copy by ctr+C, past by ctr+V, cut by ctr+X, etc...
     - Using iscntrl(char) in <ctype.h> to get ctrl key
+    
+    - Configuration termios control flags to do something if no input in 1 milisecond 
+    - c_cc[VMIN] = 0 -> No need to enter any characters first to start reading
+    - c_cc[VTIME] = 1 -> 1 milisecond to exit read() when no characters are entered
 */
 void readKeyPress();
-/*
-    Test functions
-*/
+
+/***    Test functions      ***/
 void testInput(char c);
 #endif
