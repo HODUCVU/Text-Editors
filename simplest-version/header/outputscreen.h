@@ -1,6 +1,7 @@
 #ifndef _OUTPUTSCREEN_H
 #define _OUTPUTSCREEN_H
 
+#include "global.h"
 #include <stdbool.h>
 
 /*
@@ -39,7 +40,7 @@ void drawRows();
 --? But when we change the size of screen, 
         it will not update size of editor, how fix this?
 */
-int getWindowSize(int *row, int *col);
+int getWindowSize(WindowXY *window);
 
 /*
     Get cursor position
@@ -55,6 +56,9 @@ int getWindowSize(int *row, int *col);
         Like this: \x1b[45;66R
         -> x = 66 and y = 45, that is end of screen position
     Read into a buffer until 'R'
+    -> buffer = '\x1b[y;x'
+    -> buffer[1] = '[y;x'
+
     Check:
         printf("\r\n");
         char c;
@@ -66,7 +70,8 @@ int getWindowSize(int *row, int *col);
         }
 */
 bool askCursorPosition();
-void readIntoBuffer(char *buffer, int bufferSize);
-int getCurserPosition();
+void readCursorInfoIntoBuffer(char *buffer, int bufferSize);
+int parsePositionFromBuffer(char *buffer, WindowXY *window);
+int getCurserPosition(WindowXY *window);
 
 #endif

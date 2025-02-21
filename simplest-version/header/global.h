@@ -5,15 +5,15 @@
 
 /***        Define attributes       ***/
 
-struct WindowXY {
+typedef struct WindowXY {
     int screenRows;
     int screenCols;
-};
+} WindowXY;
 struct Config {
     /*
         Store rows and cols of entire screen
     */
-    struct WindowXY windowXY;
+    WindowXY windowXY;
     /*
         To return original terminal setting for user when program exit 
         or just don't need to visable input from keyboard.

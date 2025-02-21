@@ -5,6 +5,6 @@
 #include <stdlib.h>
 
 void initWindowSize() {
-    if((getWindowSize(&config.windowXY.screenRows, &config.windowXY.screenCols)) == -1)
+    if((getWindowSize(&config.windowXY)) == -1)
         die("getWindowSize");
 }

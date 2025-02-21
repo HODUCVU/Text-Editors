@@ -77,7 +77,7 @@ bool askCursorPosition() {
     return write(STDOUT_FILENO, ASK_CURRENT_CURSOR_POSITION, BYTE_OUT_ASK_CURSOR_POSITION)
     != BYTE_OUT_ASK_CURSOR_POSITION;
 }
-void readIntoBuffer(char *buffer, int bufferSize) {
+void readCursorInfoIntoBuffer(char *buffer, int bufferSize) {
     int readIdx = 0;
     while(readIdx < bufferSize - 1) {
         if(read(STDIN_FILENO,&buffer[readIdx], 1) != 1) 
@@ -88,24 +88,29 @@ void readIntoBuffer(char *buffer, int bufferSize) {
     }
     buffer[readIdx] = '\0';
 }
-int getCurserPosition() {
+int parsePositionFromBuffer(char *buffer, WindowXY *window) {
+    if(buffer[0] != '\x1b' || buffer[1] != '[')
+        return -1;
+    return sscanf(&buffer[2], "%d;%d", &(*window).screenRows, &(*window).screenCols);
+}
+int getCurserPosition(WindowXY *window) {
     char buffer[BUFFER_SIZE];
     if(askCursorPosition()) return -1;
-    readIntoBuffer(buffer, BUFFER_SIZE);
-    printf("\r\n&buffer[1]: '%s' \r\n", &buffer[1]);
-    readKeypress();
-    return -1;
+    readCursorInfoIntoBuffer(buffer, BUFFER_SIZE);
+    if(parsePositionFromBuffer(buffer, window) != 2)
+        return -1;
+    return 0;
 }
 
-int getWindowSize(int *row, int *col){
+int getWindowSize(WindowXY *window){
     struct winsize wsize;
     if(1 || ioctl(STDOUT_FILENO, TIOCGWINSZ, &wsize) == -1 || wsize.ws_col == 0) {
         if(write(STDOUT_FILENO, BOTTOM_RIGHT_CURSOR, BYTE_OUT_BOTTOM_RIGHT_CURSOR)
             != BYTE_OUT_BOTTOM_RIGHT_CURSOR)
             return -1;
-        return getCurserPosition();
+        return getCurserPosition(window);
     }
-    *col = wsize.ws_col;
-    *row = wsize.ws_row;
+    (*window).screenCols = wsize.ws_col;
+    (*window).screenRows = wsize.ws_row;
     return 0;
 }
