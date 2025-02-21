@@ -104,7 +104,7 @@ int getCurserPosition(WindowXY *window) {
 
 int getWindowSize(WindowXY *window){
     struct winsize wsize;
-    if(1 || ioctl(STDOUT_FILENO, TIOCGWINSZ, &wsize) == -1 || wsize.ws_col == 0) {
+    if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &wsize) == -1 || wsize.ws_col == 0) {
         if(write(STDOUT_FILENO, BOTTOM_RIGHT_CURSOR, BYTE_OUT_BOTTOM_RIGHT_CURSOR)
             != BYTE_OUT_BOTTOM_RIGHT_CURSOR)
             return -1;
