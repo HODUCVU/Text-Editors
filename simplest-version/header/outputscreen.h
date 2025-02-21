@@ -1,6 +1,8 @@
 #ifndef _OUTPUTSCREEN_H
 #define _OUTPUTSCREEN_H
 
+#include <stdbool.h>
+
 /*
     lib: <unistd.h>
     Fuctions used: write() to write on terminal output
@@ -38,5 +40,33 @@ void drawRows();
         it will not update size of editor, how fix this?
 */
 int getWindowSize(int *row, int *col);
+
+/*
+    Get cursor position
+    Use "\x1b[6n" with:
+        + "n": query the terminal for status information
+        + "6": to ask for the cursor position
+    -> result: 
+        + 27: ESC === \x1b
+        + [
+        + y
+        + x
+        + R
+        Like this: \x1b[45;66R
+        -> x = 66 and y = 45, that is end of screen position
+    Read into a buffer until 'R'
+    Check:
+        printf("\r\n");
+        char c;
+        while(read(STDIN_FILENO, &c, 1) == 1) {
+            if(iscntrl(c)) 
+                printf("%d\r\n", c);
+            else 
+                printf("%d ('%c')\r\n", c, c);
+        }
+*/
+bool askCursorPosition();
+void readIntoBuffer(char *buffer, int bufferSize);
+int getCurserPosition();
 
 #endif
