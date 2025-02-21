@@ -5,4 +5,4 @@ all: editor
 editor: main.c 
 	$(CC) -o exe/main *.c -Wall -W -pedantic -std=c99 -I./header
 clean:
-	rm main
+	exe/main
