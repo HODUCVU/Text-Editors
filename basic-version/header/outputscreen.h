@@ -22,6 +22,7 @@ void refreshScreen();
     In the future, I will replace this to number column
 */
 void drawRows();
+void moveCursonToTopOfScreen();
 /*
     Build window size of editor
     lib: <sys/ioctl.h>

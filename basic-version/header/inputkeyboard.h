@@ -40,6 +40,8 @@ typedef enum {
     - Configuration termios control flags to do something if no input in 1 milisecond 
     - c_cc[VMIN] = 0 -> No need to enter any characters first to start reading
     - c_cc[VTIME] = 1 -> 1 milisecond to exit read() when no characters are entered
+
+    Check until read is success -> read = 1 (sizeof(char)), but if read = -1 then kill program
 */
 char readKeypress();
 /*

@@ -6,16 +6,16 @@
 
 
 /*** terminal ***/
-extern void enableRawMode();
+void enableRawMode();
 
 /***  initialize ***/
-extern void initWindowSize();
+void initWindowSize();
 
 /*** keyboard ***/
-extern void processingKeypress();
+void processingKeypress();
 
 /*** screen ***/
-extern void refreshScreen();
+void refreshScreen();
 
 int main() {
   enableRawMode();

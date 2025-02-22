@@ -6,13 +6,13 @@
 #include <ctype.h>
 #include <stdlib.h>
 
-
+#define BYTE_READ_INPUT sizeof(char)
+#define READ_INTPUT_FAIL -1
 char readKeypress() {
     char c;
     int nread;
-    // Check until read is success -> read = 1, but if read = -1 then kill program
-    while((nread = read(STDIN_FILENO, &c, 1)) != 1) 
-        if(nread == -1 && errno == EAGAIN)
+    while((nread = read(STDIN_FILENO, &c, BYTE_READ_INPUT)) != BYTE_READ_INPUT) 
+        if(nread == READ_INTPUT_FAIL && errno == EAGAIN)
             die("read");
     return c;
 }
