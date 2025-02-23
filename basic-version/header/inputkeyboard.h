@@ -5,14 +5,6 @@
     Keyboard shortcut values
     using iscntrl(char) in <ctype.h> to get ctrl key shortcut
 
-    Or just
---> #define CTRL_KEY(key) ((key) & 0x1f)
-    to define ctrl keyword, like CTRL_Q == CTRL_KEY('q')
-*/
-typedef enum {
-    TAB = 9,        // Move to another file while ESC
-    ENTER = 10,     // Enter edit mode while ESC
-    ESC = 27,       // Exit edit mode
     CTRL_A = 1,     // select all
     CTRL_Q = 17,    // quit
     CTRL_S = 19,    // save
@@ -22,10 +14,23 @@ typedef enum {
     CTRL_X = 24,    // cut
     CTRL_Y = 25,    // undo
     CTRL_Z = 26,    // undo, can use CTRL_Y instead.
-    LEFT_ARROW = 37,
-    UP_ARROW = 38,
-    RIGHT_ARROW = 39,
-    DOWN_ARROW = 40,
+    ARROW_LEFT = 37,
+    ARROW_UP = 38,
+    ARROW_RIGHT = 39,
+    ARROW_DOWN = 40,
+    Or just
+--> #define CTRL_KEY(key) ((key) & 0x1f)
+    to define ctrl keyword, like CTRL_Q == CTRL_KEY('q')
+*/
+#define CTRL_KEY(key) ((key) & 0x1f)
+typedef enum {
+    TAB = 9,        // Move to another file while ESC
+    ENTER = 10,     // Enter edit mode while ESC
+    ESC = '\x1b',       // Exit edit mode
+    ARROW_UP = 1000,
+    ARROW_DOWN,
+    ARROW_RIGHT,
+    ARROW_LEFT,
 } ControlKey;
 
 /*
@@ -43,11 +48,28 @@ typedef enum {
 
     Check until read is success -> read = 1 (sizeof(char)), but if read = -1 then kill program
 */
-char readKeypress();
+int readKeypress();
+/*
+    Arrow key up = [ + 'A' -> 2 byte, and plus 1 byt '\0'
+    '\x1b' is ESC
+*/
+int readArrowKey();
 /*
     Processing Key input from readKeyPress;
 */
 void processingKeypress();
+/*
+    Processing keyword to move cursor by
+    h j k l
+    or arrows
+*/
+// void moveCursorByHJKL(char key); -> set ESC state to us hjkl move cursor
+void moveCursorByArrows();
+int convertKeyInputToArrowValue(char key);
+void moveLeft();
+void moveRight();
+void moveUp();
+void moveDown();
 
 /***    Test functions      ***/
 void printInputFromKeyboard(char c);

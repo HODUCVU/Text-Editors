@@ -5,6 +5,16 @@
 #include <stdbool.h>
 
 /*
+    Design a buffer to minimun use write() function -> prevent hiding bugs
+    using <string.h> to copy current buffer to new buffer when want to append new character
+*/
+typedef struct Abuffer {
+    char *b;
+    int len;
+} Abuffer;
+void appendBuffer(Abuffer *buffer, const char* s, int len);
+void freeBuffer(Abuffer *buffer);
+/*
     lib: <unistd.h>
     Fuctions used: write() to write on terminal output
     This function use to erase screen
@@ -12,17 +22,35 @@
 
     cursor: https://vt100.net/docs/vt100-ug/chapter3.html#CUP
 */
+
 void eraseEntireScreen();
 /*
     Refresh screen, but still write something on editor
 */
 void refreshScreen();
+
 /*
     Daw a column of tildes (~) like in vim.
     In the future, I will replace this to number column
+    
+    '~' is tilde to draw row
+    '\r\n' is enter a new line, 
+    I transform \n to \r\n to get a new line in settingterminal.h
+    output like this:
+    ~
+    ~
+    ~
+    ...
+
+    "\x1b[K": Erase in line
+    + 2 erases the whole line
+    + 1 erases the part of the line to the left of the cursor
+    + 0 erases the part of the line to the right of the cursor
 */
-void drawRows();
-void moveCursonToTopOfScreen();
+void drawRefershScreenToBuffer(Abuffer *buffer);
+void moveCursonToTopOfScreen(Abuffer *buffer);
+void moveCursorToCurrentPosition(Abuffer *buffer);
+
 /*
     Build window size of editor
     lib: <sys/ioctl.h>
@@ -70,9 +98,12 @@ int getWindowSize(WindowXY *window);
                 printf("%d ('%c')\r\n", c, c);
         }
 */
+
 bool askCursorPosition();
 void readCursorInfoIntoBuffer(char *buffer, int bufferSize);
 int parsePositionFromBuffer(char *buffer, WindowXY *window);
 int getCurserPosition(WindowXY *window);
+
+void welcomeMessage(Abuffer *buffer);
 
 #endif
