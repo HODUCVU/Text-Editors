@@ -4,7 +4,6 @@
 #include "errorhandle.h"
 #include <stdlib.h>
 
-#define SETTING_WINDOW_ERROR -1
 #define START_X_CURSOR 0
 #define START_Y_CURSOR 2
 void initWindowSize() {

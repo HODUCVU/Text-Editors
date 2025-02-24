@@ -26,11 +26,17 @@
 typedef enum {
     TAB = 9,        // Move to another file while ESC
     ENTER = 10,     // Enter edit mode while ESC
-    ESC = '\x1b',       // Exit edit mode
+    ESC = '\x1b',   // Exit edit mode
     ARROW_UP = 1000,
     ARROW_DOWN,
     ARROW_RIGHT,
     ARROW_LEFT,
+    HOME_KEY,       // ESC[H
+    END_KEY,        // ESC[F
+    DELETE_KEY,     // ESC[3~
+    INSERT_KEY,     // ESC[2~
+    PAGE_UP,        // ESC[5~
+    PAGE_DOWN,      // ESC[6~
 } ControlKey;
 
 /*
@@ -53,7 +59,7 @@ int readKeypress();
     Arrow key up = [ + 'A' -> 2 byte, and plus 1 byt '\0'
     '\x1b' is ESC
 */
-int readArrowKey();
+int readMoveKey();
 /*
     Processing Key input from readKeyPress;
 */
@@ -64,12 +70,15 @@ void processingKeypress();
     or arrows
 */
 // void moveCursorByHJKL(char key); -> set ESC state to us hjkl move cursor
-void moveCursorByArrows();
-int convertKeyInputToArrowValue(char key);
+void moveCursorByArrows(int arrow);
+int convertArrowOrHomeEndKeyToMoveValue(char key);
+int convertPageMoveOrDeteleInsertKeyToMoveValue(char *key) ;
 void moveLeft();
 void moveRight();
 void moveUp();
 void moveDown();
+// void movePage(void(*callback)());
+// void moveToEdgesOfScreen(void(*callback)());
 
 /***    Test functions      ***/
 void printInputFromKeyboard(char c);

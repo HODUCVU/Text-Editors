@@ -6,33 +6,51 @@
 #include <ctype.h>
 #include <stdlib.h>
 
-int convertKeyInputToArrowValue(char key) {
+int convertArrowOrHomeEndKeyToMoveValue(char key) {
     switch (key)
     {
         case 'A': return ARROW_UP;
         case 'B': return ARROW_DOWN;
         case 'C': return ARROW_RIGHT;
         case 'D': return ARROW_LEFT;
+        case 'H': return HOME_KEY;
+        case 'F': return END_KEY;
     }
     return ESC;
 }
 #define BYTE_READ_INPUT sizeof(char)
-int readArrowKey() {
+int convertPageMoveOrDeteleInsertKeyToMoveValue(char *key) {
+    if(key[1] == '~')
+        switch(key[0]){
+            case '5': return PAGE_UP;
+            case '6': return PAGE_DOWN;
+            case '3': return DELETE_KEY;
+            case '2': return INSERT_KEY;
+        }
+    return ESC;
+}
+int readMoveKey() {
     char seq[3];
     if(read(STDIN_FILENO, &seq[0], BYTE_READ_INPUT) != BYTE_READ_INPUT) return ESC;
     if(read(STDIN_FILENO, &seq[1], BYTE_READ_INPUT) != BYTE_READ_INPUT) return ESC;
-    if(seq[0] == '[') return convertKeyInputToArrowValue(seq[1]);
+    if(seq[0] == '[') {
+        if(seq[1] >= '0' && seq[1] <= '9') {
+            if(read(STDIN_FILENO, &seq[2], BYTE_READ_INPUT) != BYTE_READ_INPUT) 
+                return ESC;
+            return convertPageMoveOrDeteleInsertKeyToMoveValue(&*(seq+1)); // take s[1] and s[2]
+        }
+        return convertArrowOrHomeEndKeyToMoveValue(seq[1]);
+    }    
     return ESC;
 }
-#define READ_INTPUT_FAIL -1
 int readKeypress() {
     char c;
     int nread;
     while((nread = read(STDIN_FILENO, &c, BYTE_READ_INPUT)) != BYTE_READ_INPUT) 
-        if(nread == READ_INTPUT_FAIL && errno == EAGAIN)
+        if(nread == READ_INTPUT_FAILED && errno == EAGAIN)
             die("read");
     if(c == ESC) 
-        return readArrowKey();
+        return readMoveKey();
     return (int)c;
 }
 void processingKeypress() {
@@ -42,6 +60,24 @@ void processingKeypress() {
             eraseEntireScreen();
             exit(0);
             break;
+        case PAGE_UP:
+//             movePage(moveUp);
+            config.cursorPosition.cy = 2;
+            break;
+        case PAGE_DOWN:
+//             movePage(moveDown);
+            config.cursorPosition.cy = config.windowXY.screenRows - 1;
+            break;
+        case HOME_KEY:
+//             moveToEdgesOfScreen(moveLeft);
+            config.cursorPosition.cx = 0;
+            break;
+        case END_KEY:
+//             moveToEdgesOfScreen(moveRight);
+            config.cursorPosition.cx = config.windowXY.screenCols - 1;
+            break;
+        case DELETE_KEY:
+            break;
         case ARROW_UP:
         case ARROW_DOWN:
         case ARROW_RIGHT:
@@ -50,6 +86,17 @@ void processingKeypress() {
             break;
     }
 }
+// void (*callback)();
+// void movePage(void(*callback)()) {
+//     int times = config.windowXY.screenRows;
+//     while(times--)
+//         callback();
+// }
+// void moveToEdgesOfScreen(void(*callback)()) {
+//     int times = config.windowXY.screenCols;
+//     while(times--)
+//         callback();
+// }
 void moveUp() {
     if(config.cursorPosition.cy != 2)
         config.cursorPosition.cy--;
@@ -59,18 +106,11 @@ void moveDown() {
         config.cursorPosition.cy++;
 }
 void moveLeft() {
-    if(config.cursorPosition.cx == 0) {
-        if(config.cursorPosition.cy != 2)
-            config.cursorPosition.cx = config.windowXY.screenCols - 1;
-        moveUp();
-    }
-    else config.cursorPosition.cx--;
+    if(config.cursorPosition.cx != 0)
+        config.cursorPosition.cx--;
 }
 void moveRight() {
-    if(config.cursorPosition.cx == config.windowXY.screenCols - 1) {
-        config.cursorPosition.cx = 0;
-        moveDown();
-    } else 
+    if(config.cursorPosition.cx != config.windowXY.screenCols - 1)
         config.cursorPosition.cx++;
 }
 void moveCursorByArrows(int arrow) {

@@ -28,6 +28,17 @@ struct Config {
     struct termios original_termios;
 };
 
+typedef enum {
+    READ_TERMINAL_SIZE_FAILED = -1,
+    SETTING_TERMINAL_ERROR = -1,
+    SETTING_WINDOW_ERROR = -1,
+    READ_INTPUT_FAILED = -1
+} ERRORVALUES;
+
+typedef enum {
+    SETTING_WINDOW_SUCCESS,
+} SUCCESSVALUES;
+
 /***    Global variables/functions    ***/
 extern struct Config config;
 

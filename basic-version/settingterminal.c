@@ -10,9 +10,9 @@
 void die(const char* s);
 
 /***    Define functions --> Config Terminal    ***/
-#define SETTING_TERMINAL_ERROR -1
 void disableRawMode() {
-    if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &config.original_termios) == SETTING_TERMINAL_ERROR)
+    if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &config.original_termios) 
+        == SETTING_TERMINAL_ERROR)
         die("tcsetattr");
 }
 void enableRawMode() {

@@ -89,8 +89,6 @@ void drawRefershScreenToBuffer(Abuffer *buffer) {
     }
 }
 
-// #define START_POSITION_OF_CURSOR "\x1b[2;0H"
-// #define BYTE_OUT_START_POSITION_OF_CURSOR 6
 #define START_POSITION_OF_CURSOR "\x1b[H"
 #define BYTE_OUT_START_POSITION_OF_CURSOR 3
 void moveCursonToTopOfScreen(Abuffer *buffer) {
@@ -129,8 +127,6 @@ void refreshScreen() {
 #define BYTE_OUT_BOTTOM_RIGHT_CURSOR 12 // 6 + 6
 #define ASK_CURRENT_CURSOR_POSITION "\x1b[6n"
 #define BYTE_OUT_ASK_CURSOR_POSITION 4
-#define SETTING_WINDOW_ERROR -1
-#define SETTING_WINDOW_SUCCESS 0
 bool askCursorPosition() {
     return write(STDOUT_FILENO, ASK_CURRENT_CURSOR_POSITION, BYTE_OUT_ASK_CURSOR_POSITION)
     != BYTE_OUT_ASK_CURSOR_POSITION;
@@ -160,7 +156,6 @@ int getCurserPosition(WindowXY *window) {
     return SETTING_WINDOW_SUCCESS;
 }
 
-#define READ_TERMINAL_SIZE_FAILED -1
 int getWindowSize(WindowXY *window){
     struct winsize wsize;
     if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &wsize) == READ_TERMINAL_SIZE_FAILED || wsize.ws_col == 0) {
