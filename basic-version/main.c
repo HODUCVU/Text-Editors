@@ -5,7 +5,6 @@
 #include "fileIO.h"
 #include <stdio.h>
 
-
 /*** terminal ***/
 void enableRawMode();
 

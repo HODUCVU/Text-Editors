@@ -92,19 +92,21 @@ void drawRefershScreenToBuffer(Abuffer *buffer) {
     for(int row = 1; row < config.windowXY.screenRows; row++)
         drawRow(buffer, row);
 }
-int writeContentToScreen(Abuffer *buffer) {
-    int r = 1;
+int writeContentToRows(Abuffer *buffer) {
+    int r = 0;
     for(; r <= config.erow.numrows; r++) {
-        int len = config.erow.row.size;
+        int len = config.erow.row[r].size;
         if(len > config.windowXY.screenCols) 
             len = config.windowXY.screenCols;
-        appendBuffer(buffer, config.erow.row.chars, len);
+        appendBuffer(buffer, config.erow.row[r].chars, len);
+        if(r < config.erow.numrows)
+            appendBuffer(buffer, NEW_LINE, 2);
     }
-    return r;
+    return r+1;
 }
 void drawScreenInEditorMode(Abuffer *buffer) {
     drawTitleEditor(buffer);
-    int row = writeContentToScreen(buffer);
+    int row = writeContentToRows(buffer);
     for(;row < config.windowXY.screenRows; row++) 
         drawRow(buffer,row);
 }

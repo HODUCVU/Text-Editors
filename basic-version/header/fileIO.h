@@ -7,7 +7,7 @@
 FILE* readFile(char *filename);
 void closeFile(FILE **fp) ;
 bool removeEndLine(char* line, ssize_t lineLen);
-void readContentToRow(char* line, ssize_t lineLen);
+void appendRow(char* line, size_t lineLen);
 /*
     ssize_t from <sys/types.h> 
     malloc from <stdlib.h>

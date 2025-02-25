@@ -30,16 +30,18 @@ typedef struct Erow {
 */
 typedef struct ConfigERows {
     int numrows;
-    Erow row;
+    Erow *row;
 } ConfigERows;
-
+typedef struct Scrolling{
+    int rowoffset;
+} Scrolling;
 struct Config {
     CursorPostiion cursorPosition;
     WindowXY windowXY;
     ConfigERows erow;
+    Scrolling scrolling;
     /*
-        To return original terminal setting for user when program exit 
-        or just don't need to visable input from keyboard.
+        To return original terminal setting
     */
     struct termios original_termios;
 };

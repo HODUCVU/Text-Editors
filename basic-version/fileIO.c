@@ -1,3 +1,6 @@
+#define _DEFAULT_SOURCE
+#define _BSD_SOURCE
+#define _GNU_SOURCE
 #include "fileIO.h"
 #include "global.h"
 #include "errorhandle.h"
@@ -12,29 +15,28 @@ FILE* readFile(char *filename) {
 void closeFile(FILE **fp) {
     fclose(*fp);
 }
-void readContentToRow(char* line, ssize_t lineLen) {
-    config.erow.row.size = lineLen;
-    config.erow.row.chars = malloc(lineLen + 1);
-    memcpy(config.erow.row.chars, line, lineLen);
-    config.erow.row.chars[lineLen] = '\0';
-    config.erow.numrows += 1;
+void appendRow(char* line, size_t lineLen) {
+    config.erow.row = realloc(config.erow.row, sizeof(Erow)*(config.erow.numrows + 1));
+    int at = config.erow.numrows;
+    config.erow.row[at].size = lineLen;
+    config.erow.row[at].chars = malloc(lineLen + 1);
+    memcpy(config.erow.row[at].chars, line, lineLen);
+    config.erow.row[at].chars[lineLen] = '\0';
+    config.erow.numrows++;
 }
 bool removeEndLine(char* line, ssize_t lineLen) {
-    return lineLen >= 0 && (line[lineLen - 1] == '\r' || line[lineLen - 1] == '\n');
+    return lineLen > 0 && (line[lineLen - 1] == '\r' || line[lineLen - 1] == '\n');
 }
 void openEditor(char *filename) {
     FILE *fp = readFile(filename);
     char* line = NULL;
     size_t lineCap = 0;
     ssize_t lineLen = 0;
-    // while(fgets(line, lineCap, fp)){
-        lineLen = getline(&line, &lineCap, fp);
-        if(lineLen != -1) {
-            while(removeEndLine(line, lineLen))
-                lineLen--;
-            readContentToRow(line, lineLen);
-        }
-    // } 
+    while((lineLen = getline(&line, &lineCap, fp)) != -1){
+        while(removeEndLine(line, lineLen))
+            lineLen--;
+        appendRow(line, lineLen);
+    } 
     free(line);
     closeFile(&fp);
 }

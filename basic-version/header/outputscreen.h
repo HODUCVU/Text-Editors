@@ -50,7 +50,7 @@ void refreshScreen();
 void drawRow(Abuffer *buffer, int row);
 void drawRefershScreenToBuffer(Abuffer *buffer);
 void drawTitleEditor(Abuffer *buffer);
-int writeContentToScreen(Abuffer *buffer) ;
+int writeContentToRows(Abuffer *buffer) ;
 void drawScreenInEditorMode(Abuffer *buffer);
 
 void moveCursorToCurrentPosition(Abuffer *buffer);
