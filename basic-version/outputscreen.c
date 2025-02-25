@@ -72,27 +72,41 @@ void welcomeMessage(Abuffer *buffer) {
     appendBuffer(buffer, welcome, welcomeLen);
     appendBuffer(buffer, NEW_LINE, 2);
 }
-
 #define DRAW_ROW_SYMBOL "~"
 #define BYTE_OUT_DRAW_ROW 1
 #define ERASE_RIGHT_EACH_LINE_FROM_CURSOR "\x1b[K"
 #define BYTE_OUT_CLEAR_EACH_LINE 3
 #define ERASE_TOP_SCREEN "\x1b[1J\x1b[H"
-void drawRefershScreenToBuffer(Abuffer *buffer) {
+void drawTitleEditor(Abuffer *buffer) {
     appendBuffer(buffer, ERASE_TOP_SCREEN, BYTE_OUT_TO_TERMINAL);
     welcomeMessage(buffer);
-    for(int row = 1; row < config.windowXY.screenRows; row++) {
-        appendBuffer(buffer, DRAW_ROW_SYMBOL, BYTE_OUT_DRAW_ROW);
-        appendBuffer(buffer, ERASE_RIGHT_EACH_LINE_FROM_CURSOR, BYTE_OUT_CLEAR_EACH_LINE);
-        if(row < config.windowXY.screenRows - 1)
-            appendBuffer(buffer, NEW_LINE, 2);
-    }
 }
-
-#define START_POSITION_OF_CURSOR "\x1b[H"
-#define BYTE_OUT_START_POSITION_OF_CURSOR 3
-void moveCursonToTopOfScreen(Abuffer *buffer) {
-    appendBuffer(buffer, START_POSITION_OF_CURSOR, BYTE_OUT_START_POSITION_OF_CURSOR);
+void drawRow(Abuffer *buffer, int row) {
+    appendBuffer(buffer, DRAW_ROW_SYMBOL, BYTE_OUT_DRAW_ROW);
+    appendBuffer(buffer, ERASE_RIGHT_EACH_LINE_FROM_CURSOR, BYTE_OUT_CLEAR_EACH_LINE);
+    if(row < config.windowXY.screenRows-1)
+        appendBuffer(buffer, NEW_LINE, 2);
+}
+void drawRefershScreenToBuffer(Abuffer *buffer) {
+    drawTitleEditor(buffer);
+    for(int row = 1; row < config.windowXY.screenRows; row++)
+        drawRow(buffer, row);
+}
+int writeContentToScreen(Abuffer *buffer) {
+    int r = 1;
+    for(; r <= config.erow.numrows; r++) {
+        int len = config.erow.row.size;
+        if(len > config.windowXY.screenCols) 
+            len = config.windowXY.screenCols;
+        appendBuffer(buffer, config.erow.row.chars, len);
+    }
+    return r;
+}
+void drawScreenInEditorMode(Abuffer *buffer) {
+    drawTitleEditor(buffer);
+    int row = writeContentToScreen(buffer);
+    for(;row < config.windowXY.screenRows; row++) 
+        drawRow(buffer,row);
 }
 /*
     range [1 -> n]
@@ -116,7 +130,8 @@ void writeOutScreen(Abuffer *buffer) {
 void refreshScreen() {
     Abuffer buffer = ABUFFER_INIT;
     appendBuffer(&buffer, HIDE_CURSOR, BYTE_OUT_DISPLAY_STATUS_CURSOR);
-    drawRefershScreenToBuffer(&buffer);
+    // drawRefershScreenToBuffer(&buffer);
+    drawScreenInEditorMode(&buffer);
     moveCursorToCurrentPosition(&buffer);
     appendBuffer(&buffer, SHOW_CURSOR, BYTE_OUT_DISPLAY_STATUS_CURSOR);
     writeOutScreen(&buffer);

@@ -3,6 +3,6 @@
 
 all: editor
 editor: main.c 
-	$(CC) -o exe/main *.c -Wall -W -pedantic -std=c99 -I./header
+	$(CC) -o exe/main *.c -Wall -W -pedantic -std=c99 -I./header -D_GNU_SOURCE
 clean:
 	exe/main

@@ -18,9 +18,25 @@ typedef struct WindowXY {
     int screenRows;
     int screenCols;
 } WindowXY;
+/*
+    Data type for storing a row of text in editor
+*/
+typedef struct Erow {
+    int size;
+    char *chars;
+} Erow;
+/*
+    Rows config in editor
+*/
+typedef struct ConfigERows {
+    int numrows;
+    Erow row;
+} ConfigERows;
+
 struct Config {
     CursorPostiion cursorPosition;
     WindowXY windowXY;
+    ConfigERows erow;
     /*
         To return original terminal setting for user when program exit 
         or just don't need to visable input from keyboard.

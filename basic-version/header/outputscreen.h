@@ -47,10 +47,13 @@ void refreshScreen();
     + 1 erases the part of the line to the left of the cursor
     + 0 erases the part of the line to the right of the cursor
 */
+void drawRow(Abuffer *buffer, int row);
 void drawRefershScreenToBuffer(Abuffer *buffer);
-void moveCursonToTopOfScreen(Abuffer *buffer);
-void moveCursorToCurrentPosition(Abuffer *buffer);
+void drawTitleEditor(Abuffer *buffer);
+int writeContentToScreen(Abuffer *buffer) ;
+void drawScreenInEditorMode(Abuffer *buffer);
 
+void moveCursorToCurrentPosition(Abuffer *buffer);
 /*
     Build window size of editor
     lib: <sys/ioctl.h>
