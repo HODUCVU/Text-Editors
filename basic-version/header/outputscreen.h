@@ -1,3 +1,11 @@
+/************************
+ * 
+ * Author: Ho Duc Vu
+ * Date: 26/02/2025
+ * Mail: hoducvu1234@gmail.com
+ * Github: https://github.com/HODUCVU
+ *  
+ * ************************/
 #ifndef _OUTPUTSCREEN_H
 #define _OUTPUTSCREEN_H
 
@@ -28,6 +36,7 @@ void eraseEntireScreen();
     Refresh screen, but still write something on editor
 */
 void refreshScreen();
+void writeOutScreen(Abuffer *buffer);
 
 /*
     Daw a column of tildes (~) like in vim.
@@ -48,10 +57,10 @@ void refreshScreen();
     + 0 erases the part of the line to the right of the cursor
 */
 void drawRow(Abuffer *buffer, int row);
-void drawRefershScreenToBuffer(Abuffer *buffer);
+// void drawRefershScreenToBuffer(Abuffer *buffer);
 void drawTitleEditor(Abuffer *buffer);
 int writeContentToRows(Abuffer *buffer) ;
-void drawScreenInEditorMode(Abuffer *buffer);
+void drawEditorScreen(Abuffer *buffer);
 
 void moveCursorToCurrentPosition(Abuffer *buffer);
 /*

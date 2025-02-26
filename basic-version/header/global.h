@@ -1,3 +1,11 @@
+/************************
+ * 
+ * Author: Ho Duc Vu
+ * Date: 26/02/2025
+ * Mail: hoducvu1234@gmail.com
+ * Github: https://github.com/HODUCVU
+ *  
+ * ************************/
 #ifndef _GLOBAL_H
 #define _GLOBAL_H
 
@@ -33,7 +41,7 @@ typedef struct ConfigERows {
     Erow *row;
 } ConfigERows;
 typedef struct Scrolling{
-    int rowoffset;
+    int rowoffset; // for vertical
 } Scrolling;
 struct Config {
     CursorPostiion cursorPosition;

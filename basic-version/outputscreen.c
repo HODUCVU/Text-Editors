@@ -1,3 +1,11 @@
+/************************
+ * 
+ * Author: Ho Duc Vu
+ * Date: 26/02/2025
+ * Mail: hoducvu1234@gmail.com
+ * Github: https://github.com/HODUCVU
+ *  
+ * ************************/
 #include "outputscreen.h"
 #include "global.h"
 #include "inputkeyboard.h"
@@ -18,7 +26,7 @@ void appendBuffer(Abuffer *buffer, const char* s, int len) {
     buffer->b = new_buffer;
     buffer->len += len;
 }
-void freeBuffer(Abuffer *buffer) {
+inline void freeBuffer(Abuffer *buffer) {
     free(buffer->b);
 }
 
@@ -53,7 +61,7 @@ void freeBuffer(Abuffer *buffer) {
     "\x1b[1J" -> 3 byte
     "\x1b[2J\x1b[H" -> 7 byte
 */
-void eraseEntireScreen() {
+inline void eraseEntireScreen() {
     write(STDOUT_FILENO, ERASE_ENTIR_ESCREEN, BYTE_OUT_TO_TERMINAL);
 }
 
@@ -87,14 +95,14 @@ void drawRow(Abuffer *buffer, int row) {
     if(row < config.windowXY.screenRows-1)
         appendBuffer(buffer, NEW_LINE, 2);
 }
-void drawRefershScreenToBuffer(Abuffer *buffer) {
-    drawTitleEditor(buffer);
-    for(int row = 1; row < config.windowXY.screenRows; row++)
-        drawRow(buffer, row);
-}
+// void drawRefershScreenToBuffer(Abuffer *buffer) {
+//     drawTitleEditor(buffer);
+//     for(int row = 1; row < config.windowXY.screenRows; row++)
+//         drawRow(buffer, row);
+// }
 int writeContentToRows(Abuffer *buffer) {
     int r = 0;
-    for(; r <= config.erow.numrows; r++) {
+    for(; r < config.erow.numrows; r++) {
         int len = config.erow.row[r].size;
         if(len > config.windowXY.screenCols) 
             len = config.windowXY.screenCols;
@@ -104,7 +112,7 @@ int writeContentToRows(Abuffer *buffer) {
     }
     return r+1;
 }
-void drawScreenInEditorMode(Abuffer *buffer) {
+void drawEditorScreen(Abuffer *buffer) {
     drawTitleEditor(buffer);
     int row = writeContentToRows(buffer);
     for(;row < config.windowXY.screenRows; row++) 
@@ -122,7 +130,7 @@ void moveCursorToCurrentPosition(Abuffer *buffer) {
         config.cursorPosition.cy, config.cursorPosition.cx + 1);
     appendBuffer(buffer, temp_buff, strlen(temp_buff));
 }
-void writeOutScreen(Abuffer *buffer) {
+inline void writeOutScreen(Abuffer *buffer) {
     write(STDOUT_FILENO, buffer->b, buffer->len);
 }
 
@@ -132,8 +140,7 @@ void writeOutScreen(Abuffer *buffer) {
 void refreshScreen() {
     Abuffer buffer = ABUFFER_INIT;
     appendBuffer(&buffer, HIDE_CURSOR, BYTE_OUT_DISPLAY_STATUS_CURSOR);
-    // drawRefershScreenToBuffer(&buffer);
-    drawScreenInEditorMode(&buffer);
+    drawEditorScreen(&buffer);
     moveCursorToCurrentPosition(&buffer);
     appendBuffer(&buffer, SHOW_CURSOR, BYTE_OUT_DISPLAY_STATUS_CURSOR);
     writeOutScreen(&buffer);
@@ -144,7 +151,7 @@ void refreshScreen() {
 #define BYTE_OUT_BOTTOM_RIGHT_CURSOR 12 // 6 + 6
 #define ASK_CURRENT_CURSOR_POSITION "\x1b[6n"
 #define BYTE_OUT_ASK_CURSOR_POSITION 4
-bool askCursorPosition() {
+inline bool askCursorPosition() {
     return write(STDOUT_FILENO, ASK_CURRENT_CURSOR_POSITION, BYTE_OUT_ASK_CURSOR_POSITION)
     != BYTE_OUT_ASK_CURSOR_POSITION;
 }

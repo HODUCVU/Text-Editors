@@ -1,3 +1,11 @@
+/************************
+ * 
+ * Author: Ho Duc Vu
+ * Date: 26/02/2025
+ * Mail: hoducvu1234@gmail.com
+ * Github: https://github.com/HODUCVU
+ *  
+ * ************************/
 #include "inputkeyboard.h"
 #include "errorhandle.h"
 #include "outputscreen.h"
@@ -97,19 +105,19 @@ void processingKeypress() {
 //     while(times--)
 //         callback();
 // }
-void moveUp() {
+inline void moveUp() {
     if(config.cursorPosition.cy != 2)
         config.cursorPosition.cy--;
 }
-void moveDown() {
+inline void moveDown() {
     if(config.cursorPosition.cy != config.windowXY.screenRows - 1)
         config.cursorPosition.cy++;
 }
-void moveLeft() {
+inline void moveLeft() {
     if(config.cursorPosition.cx != 0)
         config.cursorPosition.cx--;
 }
-void moveRight() {
+inline void moveRight() {
     if(config.cursorPosition.cx != config.windowXY.screenCols - 1)
         config.cursorPosition.cx++;
 }

@@ -1,3 +1,11 @@
+/************************
+ * 
+ * Author: Ho Duc Vu
+ * Date: 26/02/2025
+ * Mail: hoducvu1234@gmail.com
+ * Github: https://github.com/HODUCVU
+ *  
+ * ************************/
 #define _DEFAULT_SOURCE
 #define _BSD_SOURCE
 #define _GNU_SOURCE
@@ -12,7 +20,7 @@ FILE* readFile(char *filename) {
     if(!fp) die("fopen");
     return fp;
 }
-void closeFile(FILE **fp) {
+inline void closeFile(FILE **fp) {
     fclose(*fp);
 }
 void appendRow(char* line, size_t lineLen) {
@@ -24,7 +32,7 @@ void appendRow(char* line, size_t lineLen) {
     config.erow.row[at].chars[lineLen] = '\0';
     config.erow.numrows++;
 }
-bool removeEndLine(char* line, ssize_t lineLen) {
+inline bool removeEndLine(char* line, ssize_t lineLen) {
     return lineLen > 0 && (line[lineLen - 1] == '\r' || line[lineLen - 1] == '\n');
 }
 void openEditor(char *filename) {
