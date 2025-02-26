@@ -31,36 +31,7 @@ inline void freeBuffer(Abuffer *buffer) {
 }
 
 #define ERASE_ENTIR_ESCREEN "\x1b[2J\x1b[H"
-/*
-    "\x1b[2J" sends an ANSI escape command to clear the screen.
-    "\x1b[H": Moves the cursor to the top of the screen.
-    "\x1b[K": Erase in line
-    "\x1b[J": Clears from the cursor position to the bottom of the screen.
-    "\x1b[1J": Clears from the top of the screen to the cursor position.
-    "\x1b[2J\x1b[H": Clears the entire screen and moves the cursor to the top corner.
-
-    + "J" command to clear the screen, 
-    + "2" argument which says to clear entire screen, 
-        <esc>[1] would clear the screen up to where the cursor is
-            -> like "\x1b[1J"
-        <esc>[0] would clear the screen from the cursor up to the end of the screen 
-            -> like "\x1b[J"
-            
-    "\x1b[y;xH" -> y and x are the positions where we want the cursor at
-*/
 #define BYTE_OUT_TO_TERMINAL 7
-/* 
-    first byte is "\x1b" = ESC to send control signal to terminal, 
-    other three bytes are [2J to erase entire screen 
-        + "["" = 1 byte
-        + "2" = 1 byte
-        + "J" = 1 byte
-    "\x1b[2J" -> 4 byte
-    "\x1b[H" -> 3 byte
-    "\x1b[J" -> 3 byte
-    "\x1b[1J" -> 3 byte
-    "\x1b[2J\x1b[H" -> 7 byte
-*/
 inline void eraseEntireScreen() {
     write(STDOUT_FILENO, ERASE_ENTIR_ESCREEN, BYTE_OUT_TO_TERMINAL);
 }
@@ -85,49 +56,50 @@ void welcomeMessage(Abuffer *buffer) {
 #define ERASE_RIGHT_EACH_LINE_FROM_CURSOR "\x1b[K"
 #define BYTE_OUT_CLEAR_EACH_LINE 3
 #define ERASE_TOP_SCREEN "\x1b[1J\x1b[H"
-void drawTitleEditor(Abuffer *buffer) {
+int drawTitleEditor(Abuffer *buffer) {
     appendBuffer(buffer, ERASE_TOP_SCREEN, BYTE_OUT_TO_TERMINAL);
-    welcomeMessage(buffer);
+    int beginAt = 1;
+    if(config.erow.numrows == 0)
+        welcomeMessage(buffer);
+    else beginAt = 0;
+    return beginAt;
 }
-void drawRow(Abuffer *buffer, int row) {
-    appendBuffer(buffer, DRAW_ROW_SYMBOL, BYTE_OUT_DRAW_ROW);
+inline void newLine(Abuffer *buffer, int row) {
     appendBuffer(buffer, ERASE_RIGHT_EACH_LINE_FROM_CURSOR, BYTE_OUT_CLEAR_EACH_LINE);
     if(row < config.windowXY.screenRows-1)
         appendBuffer(buffer, NEW_LINE, 2);
 }
-// void drawRefershScreenToBuffer(Abuffer *buffer) {
-//     drawTitleEditor(buffer);
-//     for(int row = 1; row < config.windowXY.screenRows; row++)
-//         drawRow(buffer, row);
-// }
-int writeContentToRows(Abuffer *buffer) {
-    int r = 0;
-    for(; r < config.erow.numrows; r++) {
-        int len = config.erow.row[r].size;
-        if(len > config.windowXY.screenCols) 
-            len = config.windowXY.screenCols;
-        appendBuffer(buffer, config.erow.row[r].chars, len);
-        if(r < config.erow.numrows)
-            appendBuffer(buffer, NEW_LINE, 2);
-    }
-    return r+1;
+inline void drawRow(Abuffer *buffer, char* content, int sizeContent) {
+    appendBuffer(buffer, content, sizeContent);
+}
+
+void writeContentToRows(Abuffer *buffer, int row) {
+    int sizeChars = config.erow.row[row].size;
+    if(sizeChars > config.windowXY.screenCols) 
+        sizeChars = config.windowXY.screenCols;
+    drawRow(buffer, config.erow.row[row].chars, sizeChars);
 }
 void drawEditorScreen(Abuffer *buffer) {
-    drawTitleEditor(buffer);
-    int row = writeContentToRows(buffer);
-    for(;row < config.windowXY.screenRows; row++) 
-        drawRow(buffer,row);
+    int row = drawTitleEditor(buffer);
+    for(; row < config.windowXY.screenRows; row++) {
+        int filerow = row + config.scrolling.rowoffset;
+        if(filerow >= config.erow.numrows) {
+            drawRow(buffer, DRAW_ROW_SYMBOL, BYTE_OUT_DRAW_ROW);
+        } else 
+            writeContentToRows(buffer, filerow);
+        newLine(buffer, row);
+    }
 }
 /*
-    range [1 -> n]
-    init y = 2; x = 0 -> y = 2; x = x + 1 = 1
+    init y = 0; x = 0 -> y = 1; x = 1
     because begin position in terminal is 1;1
 */
 #define PARSE_POSITION_OF_CURSOR "\x1b[%d;%dH"
 void moveCursorToCurrentPosition(Abuffer *buffer) {
     char temp_buff[BUFFER_SIZE];
     snprintf(temp_buff, BUFFER_SIZE, PARSE_POSITION_OF_CURSOR, 
-        config.cursorPosition.cy, config.cursorPosition.cx + 1);
+        (config.cursorPosition.cy - config.scrolling.rowoffset)+1, 
+        config.cursorPosition.cx + 1);
     appendBuffer(buffer, temp_buff, strlen(temp_buff));
 }
 inline void writeOutScreen(Abuffer *buffer) {
@@ -138,6 +110,8 @@ inline void writeOutScreen(Abuffer *buffer) {
 #define SHOW_CURSOR "\x1b[?25h"
 #define BYTE_OUT_DISPLAY_STATUS_CURSOR 6
 void refreshScreen() {
+    verticalScroll();
+
     Abuffer buffer = ABUFFER_INIT;
     appendBuffer(&buffer, HIDE_CURSOR, BYTE_OUT_DISPLAY_STATUS_CURSOR);
     drawEditorScreen(&buffer);
@@ -166,7 +140,7 @@ void readCursorInfoIntoBuffer(char *buffer, int bufferSize) {
     }
     buffer[readIdx] = '\0';
 }
-int parsePositionFromBuffer(char *buffer, WindowXY *window) {
+inline int parsePositionFromBuffer(char *buffer, WindowXY *window) {
     if(buffer[0] != '\x1b' || buffer[1] != '[')
         return SETTING_WINDOW_ERROR;
     return sscanf(&buffer[2], "%d;%d", &(*window).screenRows, &(*window).screenCols);
@@ -192,3 +166,13 @@ int getWindowSize(WindowXY *window){
     (*window).screenRows = wsize.ws_row;
     return SETTING_WINDOW_SUCCESS;
 }
+
+void verticalScroll() {
+    // scroll up
+    if(config.cursorPosition.cy < config.scrolling.rowoffset) 
+        config.scrolling.rowoffset = config.cursorPosition.cy;
+    // scroll down
+    if(config.cursorPosition.cy >= config.scrolling.rowoffset + config.windowXY.screenRows)
+        config.scrolling.rowoffset = config.cursorPosition.cy - config.windowXY.screenRows + 1;
+}
+

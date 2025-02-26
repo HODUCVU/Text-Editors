@@ -8,3 +8,6 @@
  * ************************/
 
  This is a test file
+The first if statement checks if the cursor is above the visible window, and if so, scrolls up to where the cursor is. The second if statement checks if the cursor is past the bottom of the visible window, and contains slightly more complicated arithmetic because E.rowoff refers to what’s at the top of the screen, and we have to get E.screenrows involved to talk about what’s at the bottom of the screen.
+
+Now let’s allow the cursor to advance past the bottom of the screen (but not past the bottom of the file).

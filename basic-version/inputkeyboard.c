@@ -70,11 +70,11 @@ void processingKeypress() {
             break;
         case PAGE_UP:
 //             movePage(moveUp);
-            config.cursorPosition.cy = 2;
+            config.cursorPosition.cy = 0;
             break;
         case PAGE_DOWN:
 //             movePage(moveDown);
-            config.cursorPosition.cy = config.windowXY.screenRows - 1;
+            config.cursorPosition.cy = config.erow.numrows;
             break;
         case HOME_KEY:
 //             moveToEdgesOfScreen(moveLeft);
@@ -82,7 +82,7 @@ void processingKeypress() {
             break;
         case END_KEY:
 //             moveToEdgesOfScreen(moveRight);
-            config.cursorPosition.cx = config.windowXY.screenCols - 1;
+            config.cursorPosition.cx = config.erow.row[config.cursorPosition.cy-1].size - 1;
             break;
         case DELETE_KEY:
             break;
@@ -94,31 +94,28 @@ void processingKeypress() {
             break;
     }
 }
-// void (*callback)();
-// void movePage(void(*callback)()) {
-//     int times = config.windowXY.screenRows;
-//     while(times--)
-//         callback();
-// }
-// void moveToEdgesOfScreen(void(*callback)()) {
-//     int times = config.windowXY.screenCols;
-//     while(times--)
-//         callback();
-// }
+inline void cursorAtOutOfLine() {
+    if(config.cursorPosition.cx > config.erow.row[config.cursorPosition.cy-1].size)
+        config.cursorPosition.cx = config.erow.row[config.cursorPosition.cy-1].size;
+}
 inline void moveUp() {
-    if(config.cursorPosition.cy != 2)
+    if(config.cursorPosition.cy > 0) {
         config.cursorPosition.cy--;
+        cursorAtOutOfLine();
+    }
 }
 inline void moveDown() {
-    if(config.cursorPosition.cy != config.windowXY.screenRows - 1)
+    if(config.cursorPosition.cy < config.erow.numrows) {
         config.cursorPosition.cy++;
+        cursorAtOutOfLine();
+    }
 }
 inline void moveLeft() {
-    if(config.cursorPosition.cx != 0)
+    if(config.cursorPosition.cx > 0)
         config.cursorPosition.cx--;
 }
 inline void moveRight() {
-    if(config.cursorPosition.cx != config.windowXY.screenCols - 1)
+    if(config.cursorPosition.cx < config.erow.row[config.cursorPosition.cy-1].size)
         config.cursorPosition.cx++;
 }
 void moveCursorByArrows(int arrow) {

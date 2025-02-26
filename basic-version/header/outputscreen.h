@@ -30,7 +30,34 @@ void freeBuffer(Abuffer *buffer);
 
     cursor: https://vt100.net/docs/vt100-ug/chapter3.html#CUP
 */
+/*
+    "\x1b[2J" sends an ANSI escape command to clear the screen.
+    "\x1b[H": Moves the cursor to the top of the screen.
+    "\x1b[K": Erase in line
+    "\x1b[J": Clears from the cursor position to the bottom of the screen.
+    "\x1b[1J": Clears from the top of the screen to the cursor position.
+    "\x1b[2J\x1b[H": Clears the entire screen and moves the cursor to the top corner.
 
+    + "J" command to clear the screen, 
+    + "2" argument which says to clear entire screen, 
+        <esc>[1] would clear the screen up to where the cursor is
+            -> like "\x1b[1J"
+        <esc>[0] would clear the screen from the cursor up to the end of the screen 
+            -> like "\x1b[J"
+            
+    "\x1b[y;xH" -> y and x are the positions where we want the cursor at
+
+    first byte is "\x1b" = ESC to send control signal to terminal, 
+    other three bytes are [2J to erase entire screen 
+        + "["" = 1 byte
+        + "2" = 1 byte
+        + "J" = 1 byte
+    "\x1b[2J" -> 4 byte
+    "\x1b[H" -> 3 byte
+    "\x1b[J" -> 3 byte
+    "\x1b[1J" -> 3 byte
+    "\x1b[2J\x1b[H" -> 7 byte
+*/
 void eraseEntireScreen();
 /*
     Refresh screen, but still write something on editor
@@ -56,10 +83,11 @@ void writeOutScreen(Abuffer *buffer);
     + 1 erases the part of the line to the left of the cursor
     + 0 erases the part of the line to the right of the cursor
 */
-void drawRow(Abuffer *buffer, int row);
-// void drawRefershScreenToBuffer(Abuffer *buffer);
-void drawTitleEditor(Abuffer *buffer);
-int writeContentToRows(Abuffer *buffer) ;
+void newLine(Abuffer *buffer, int row);
+void drawRow(Abuffer *buffer, char* content, int sizeContent);
+int drawTitleEditor(Abuffer *buffer);
+// bool isFileLargerThanVerticalScreen();
+void writeContentToRows(Abuffer *buffer, int row) ;
 void drawEditorScreen(Abuffer *buffer);
 
 void moveCursorToCurrentPosition(Abuffer *buffer);
@@ -118,4 +146,35 @@ int getCurserPosition(WindowXY *window);
 
 void welcomeMessage(Abuffer *buffer);
 
+void verticalScroll();
+
 #endif
+
+
+// inline bool isFileLargerThanVerticalScreen() {
+//     return config.erow.numrows > config.windowXY.screenRows;
+// }
+// int numberOfDigitsOfRow(int r) {
+//     int temp = r;
+//     int rsize = (r == 0) ? 1 : 0; // Handle case where r == 0
+//     while (temp > 0) {
+//         temp /= 10;
+//         rsize++;
+//     }
+//     return rsize;
+// }
+// char* convertNumberToChars(int r, int *rsize) {
+//     *rsize = numberOfDigitsOfRow(r);
+//     char* str = malloc(*rsize + 1); 
+//     if (str) {
+//         sprintf(str, "%d", r);
+//     }
+//     return str;
+// }
+// void drawRowNumber(Abuffer *buffer, int row) {
+//     int rsize = 0;
+//     char* rowNumber = convertNumberToChars(row, &rsize);
+//     drawRow(buffer, rowNumber, rsize+1);
+//     drawRow(buffer, " ", 1);
+//     free(rowNumber);
+// }

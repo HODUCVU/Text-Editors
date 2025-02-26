@@ -85,6 +85,7 @@ void moveLeft();
 void moveRight();
 void moveUp();
 void moveDown();
+void cursorAtOutOfLine();
 // void movePage(void(*callback)());
 // void moveToEdgesOfScreen(void(*callback)());
 
