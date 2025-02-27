@@ -1,13 +1,12 @@
 # Set Flags to setup terminal 
-    lib: <termios.h>
+`lib: <termios.h>`
 ## Turn off echoing in terminal. 
---> ECHO -> set ECHO bit = 0 in c_lflag
-    - When input some character from keyboard, it won't show on terminal, 
-        but after press Enter, it will show on terminal
-    - We can use this function to make input password from user is invisable
+> ECHO -> set ECHO bit = 0 in c_lflag
+- When input some character from keyboard, it won't show on terminal, but after press Enter, it will show on terminal
+- We can use this function to make input password from user is invisable
 
 ## Turn off canonical mode
---> ICANON
+> ICANON
 - When in canonical mode, user enters entire line before processing.
 - When turn canonical mode off, this means we will finally be reading input byte-by-byte, instead of line-by-line.
 - That mean, if in canonical mode, program only get user input when user press enter, but when turn off it, program can get any character from user input without press enter
