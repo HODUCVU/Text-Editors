@@ -23,7 +23,8 @@ void enableRawMode();
     Setting terminal return to original setting
     Turn off echoing in terminal -> just set ECHO bit = 1 in c_lflag
     Turn on cannonical mode
---> When exit program or don't need to invisable what character user input
+    ...
+--> When exit program or just want return terminal to default setting
 */
 void disableRawMode();
 

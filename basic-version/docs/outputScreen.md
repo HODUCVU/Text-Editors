@@ -8,10 +8,10 @@
 # Detail
 - `J` command to clear the screen, 
 - `2` argument which says to clear entire screen, 
-    + <esc>[1] would clear the screen up to where the cursor is
+    + `<esc>[1]` would clear the screen up to where the cursor is
         -> like `\x1b[1J`
-    + <esc>[0] would clear the screen from the cursor up to the end of the screen 
-        -> like `\x1b[J`
+    + `<esc>[0]` would clear the screen from the cursor up to the end of the screen 
+    + Example: `\x1b[J`
         
 - `\x1b[y;xH` -> y and x are the positions where we want the cursor at
 # Byte out terminal
