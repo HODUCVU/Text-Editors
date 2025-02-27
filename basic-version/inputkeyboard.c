@@ -82,7 +82,7 @@ void processingKeypress() {
             break;
         case END_KEY:
 //             moveToEdgesOfScreen(moveRight);
-            config.cursorPosition.cx = config.erow.row[config.cursorPosition.cy-1].size - 1;
+            config.cursorPosition.cx = config.erow.row[config.cursorPosition.cy].size - 1;
             break;
         case DELETE_KEY:
             break;
@@ -95,8 +95,8 @@ void processingKeypress() {
     }
 }
 inline void cursorAtOutOfLine() {
-    if(config.cursorPosition.cx > config.erow.row[config.cursorPosition.cy-1].size)
-        config.cursorPosition.cx = config.erow.row[config.cursorPosition.cy-1].size;
+    if(config.cursorPosition.cx > config.erow.row[config.cursorPosition.cy].size)
+        config.cursorPosition.cx = config.erow.row[config.cursorPosition.cy].size;
 }
 inline void moveUp() {
     if(config.cursorPosition.cy > 0) {
@@ -115,7 +115,7 @@ inline void moveLeft() {
         config.cursorPosition.cx--;
 }
 inline void moveRight() {
-    if(config.cursorPosition.cx < config.erow.row[config.cursorPosition.cy-1].size)
+    if(config.cursorPosition.cx < config.erow.row[config.cursorPosition.cy].size)
         config.cursorPosition.cx++;
 }
 void moveCursorByArrows(int arrow) {

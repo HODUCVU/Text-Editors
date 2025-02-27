@@ -39,12 +39,16 @@ inline void eraseEntireScreen() {
 #define VERSION_EDITOR "0.0.1"
 #define BUFFER_SIZE 32
 #define NEW_LINE "\r\n"
-void welcomeMessage(Abuffer *buffer) {
-    char welcome[BUFFER_SIZE];
-    int welcomeLen = snprintf(welcome, sizeof(welcome),
-            "BASIC VERSION -- version %s", VERSION_EDITOR);
+int setMessageTitle(char *welcome) {
+    int welcomeLen =  snprintf(welcome, BUFFER_SIZE,
+        "BASIC VERSION -- version %s", VERSION_EDITOR);
     if(welcomeLen > config.windowXY.screenCols)
         welcomeLen = config.windowXY.screenCols;
+    return welcomeLen;
+}
+void welcomeMessage(Abuffer *buffer) {
+    char welcome[BUFFER_SIZE];
+    int welcomeLen = setMessageTitle(welcome);
     int padding = (config.windowXY.screenCols - welcomeLen)/2;
     for(int col = 0; col < padding; col++)
         appendBuffer(buffer, " ", 1);
