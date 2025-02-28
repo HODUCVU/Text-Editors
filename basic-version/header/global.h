@@ -33,24 +33,19 @@ typedef struct Erow {
     int size;
     char *chars;
 } Erow;
-/*
-    Rows config in editor
-*/
 typedef struct ConfigERows {
     int numrows;
     Erow *row;
 } ConfigERows;
 typedef struct Scrolling{
-    int rowoffset; // for vertical
+    int rowoffset; // for vertical scrolling
+    int coloffset; // for horizontal scrolling
 } Scrolling;
 struct Config {
     CursorPostiion cursorPosition;
     WindowXY windowXY;
     ConfigERows erow;
     Scrolling scrolling;
-    /*
-        To return original terminal setting
-    */
     struct termios original_termios;
 };
 

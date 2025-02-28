@@ -12,8 +12,6 @@
 
 /*
     Details at ../docs/errorcodes.md
-    Die function that handle error and exit program
-    exit(1) to notify program that is an error
 */
 void die(const char* s);
 #endif

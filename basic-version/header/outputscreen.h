@@ -23,6 +23,7 @@ typedef struct Abuffer {
 void appendBuffer(Abuffer *buffer, const char* s, int len);
 void freeBuffer(Abuffer *buffer);
 /*
+    Details at ../docs/outputScreen.md
     lib: <unistd.h>
     Fuctions used: write() to write on terminal output
     This function use to erase screen
@@ -57,7 +58,7 @@ void writeOutScreen(Abuffer *buffer);
 void newLine(Abuffer *buffer, int row);
 void drawRow(Abuffer *buffer, char* content, int sizeContent);
 int drawTitleEditor(Abuffer *buffer);
-// bool isFileLargerThanVerticalScreen();
+int convertContentWithHorizontalOffset(char *source, int sourceSize, char *destination);
 void writeContentToRows(Abuffer *buffer, int row) ;
 void drawEditorScreen(Abuffer *buffer);
 
@@ -109,34 +110,5 @@ int setMessageTitle(char* welcome);
 void welcomeMessage(Abuffer *buffer);
 
 void verticalScroll();
-
+void horizontalSroll();
 #endif
-
-
-// inline bool isFileLargerThanVerticalScreen() {
-//     return config.erow.numrows > config.windowXY.screenRows;
-// }
-// int numberOfDigitsOfRow(int r) {
-//     int temp = r;
-//     int rsize = (r == 0) ? 1 : 0; // Handle case where r == 0
-//     while (temp > 0) {
-//         temp /= 10;
-//         rsize++;
-//     }
-//     return rsize;
-// }
-// char* convertNumberToChars(int r, int *rsize) {
-//     *rsize = numberOfDigitsOfRow(r);
-//     char* str = malloc(*rsize + 1); 
-//     if (str) {
-//         sprintf(str, "%d", r);
-//     }
-//     return str;
-// }
-// void drawRowNumber(Abuffer *buffer, int row) {
-//     int rsize = 0;
-//     char* rowNumber = convertNumberToChars(row, &rsize);
-//     drawRow(buffer, rowNumber, rsize+1);
-//     drawRow(buffer, " ", 1);
-//     free(rowNumber);
-// }

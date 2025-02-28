@@ -14,9 +14,9 @@
 */
 #define CTRL_KEY(key) ((key) & 0x1f)
 typedef enum {
-    TAB = 9,        // Move to another file while ESC
-    ENTER = 10,     // Enter edit mode while ESC
-    ESC = '\x1b',   // Exit edit mode
+    TAB = 9,       
+    ENTER = 10,     
+    ESC = '\x1b',  
     ARROW_UP = 1000,
     ARROW_DOWN,
     ARROW_RIGHT,
@@ -31,7 +31,7 @@ typedef enum {
 
 int readKeypress();
 /*
-    Arrow key up = [ + 'A' -> 2 byte, and plus 1 byt '\0'
+    Arrow key up = [ + 'A' -> 2 byte
     '\x1b' is ESC
 */
 int readMoveKey();
@@ -42,7 +42,6 @@ void processingKeypress();
 /*
     Processing keyword to move cursor by arrows
 */
-// void moveCursorByHJKL(char key); -> set ESC state to us hjkl move cursor
 void moveCursorByArrows(int arrow);
 int convertArrowOrHomeEndKeyToMoveValue(char key);
 int convertPageMoveOrDeteleInsertKeyToMoveValue(char *key) ;
@@ -51,8 +50,6 @@ void moveRight();
 void moveUp();
 void moveDown();
 void cursorAtOutOfLine();
-// void movePage(void(*callback)());
-// void moveToEdgesOfScreen(void(*callback)());
 
 /***    Test functions      ***/
 void printInputFromKeyboard(char c);

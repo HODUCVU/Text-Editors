@@ -31,21 +31,22 @@ inline void freeBuffer(Abuffer *buffer) {
 }
 
 #define ERASE_ENTIR_ESCREEN "\x1b[2J\x1b[H"
-#define BYTE_OUT_TO_TERMINAL 7
+#define BYTE_OUT_TO_TERMINAL 7 // \x1b[2J = 4 and \x1b[H = 3
 inline void eraseEntireScreen() {
     write(STDOUT_FILENO, ERASE_ENTIR_ESCREEN, BYTE_OUT_TO_TERMINAL);
 }
 
 #define VERSION_EDITOR "0.0.1"
 #define BUFFER_SIZE 32
-#define NEW_LINE "\r\n"
 int setMessageTitle(char *welcome) {
     int welcomeLen =  snprintf(welcome, BUFFER_SIZE,
         "BASIC VERSION -- version %s", VERSION_EDITOR);
-    if(welcomeLen > config.windowXY.screenCols)
+        if(welcomeLen > config.windowXY.screenCols)
         welcomeLen = config.windowXY.screenCols;
-    return welcomeLen;
-}
+        return welcomeLen;
+    }
+#define NEW_LINE "\r\n"
+#define BYTE_OUT_NEW_LINE 2
 void welcomeMessage(Abuffer *buffer) {
     char welcome[BUFFER_SIZE];
     int welcomeLen = setMessageTitle(welcome);
@@ -53,7 +54,7 @@ void welcomeMessage(Abuffer *buffer) {
     for(int col = 0; col < padding; col++)
         appendBuffer(buffer, " ", 1);
     appendBuffer(buffer, welcome, welcomeLen);
-    appendBuffer(buffer, NEW_LINE, 2);
+    appendBuffer(buffer, NEW_LINE, BYTE_OUT_NEW_LINE);
 }
 #define DRAW_ROW_SYMBOL "~"
 #define BYTE_OUT_DRAW_ROW 1
@@ -71,17 +72,32 @@ int drawTitleEditor(Abuffer *buffer) {
 inline void newLine(Abuffer *buffer, int row) {
     appendBuffer(buffer, ERASE_RIGHT_EACH_LINE_FROM_CURSOR, BYTE_OUT_CLEAR_EACH_LINE);
     if(row < config.windowXY.screenRows-1)
-        appendBuffer(buffer, NEW_LINE, 2);
+        appendBuffer(buffer, NEW_LINE, BYTE_OUT_NEW_LINE);
 }
 inline void drawRow(Abuffer *buffer, char* content, int sizeContent) {
     appendBuffer(buffer, content, sizeContent);
 }
-
+int convertContentWithHorizontalOffset(char *source, int sourceSize, char *destination) {
+    int destSize = 0, horizontalMove = config.scrolling.coloffset;
+    while(horizontalMove < sourceSize && destSize < config.windowXY.screenCols)
+        destination[destSize++] = source[horizontalMove++];
+    destination[destSize] = '\0';
+    return destSize;
+}
+// int test(int *sourceSize) {
+//     sourceSize -= config.scrolling.coloffset;
+//     return sourceSize != 0 ? sourceSize : 0;
+// }
 void writeContentToRows(Abuffer *buffer, int row) {
     int sizeChars = config.erow.row[row].size;
+    // char *contentAtRow = malloc(config.windowXY.screenCols+1);
+    // int contentSizes = convertContentWithHorizontalOffset(config.erow.row[row].chars, sizeChars, contentAtRow);
+    // drawRow(buffer, contentAtRow, contentSizes);
+    // free(contentAtRow);
+
     if(sizeChars > config.windowXY.screenCols) 
         sizeChars = config.windowXY.screenCols;
-    drawRow(buffer, config.erow.row[row].chars, sizeChars);
+    drawRow(buffer, config.erow.row[row].chars[config.scrolling.coloffset], sizeChars);
 }
 void drawEditorScreen(Abuffer *buffer) {
     int row = drawTitleEditor(buffer);
@@ -89,13 +105,13 @@ void drawEditorScreen(Abuffer *buffer) {
         int filerow = row + config.scrolling.rowoffset;
         if(filerow >= config.erow.numrows) {
             drawRow(buffer, DRAW_ROW_SYMBOL, BYTE_OUT_DRAW_ROW);
-        } else 
+        } else
             writeContentToRows(buffer, filerow);
         newLine(buffer, row);
     }
 }
 /*
-    init y = 0; x = 0 -> y = 1; x = 1
+    init y = 0; x = 0 -> plus 1 to both y and x 
     because begin position in terminal is 1;1
 */
 #define PARSE_POSITION_OF_CURSOR "\x1b[%d;%dH"
@@ -103,7 +119,7 @@ void moveCursorToCurrentPosition(Abuffer *buffer) {
     char temp_buff[BUFFER_SIZE];
     snprintf(temp_buff, BUFFER_SIZE, PARSE_POSITION_OF_CURSOR, 
         (config.cursorPosition.cy - config.scrolling.rowoffset)+1, 
-        config.cursorPosition.cx + 1);
+        (config.cursorPosition.cx - config.scrolling.coloffset)+1);
     appendBuffer(buffer, temp_buff, strlen(temp_buff));
 }
 inline void writeOutScreen(Abuffer *buffer) {
@@ -115,7 +131,7 @@ inline void writeOutScreen(Abuffer *buffer) {
 #define BYTE_OUT_DISPLAY_STATUS_CURSOR 6
 void refreshScreen() {
     verticalScroll();
-
+    horizontalSroll();
     Abuffer buffer = ABUFFER_INIT;
     appendBuffer(&buffer, HIDE_CURSOR, BYTE_OUT_DISPLAY_STATUS_CURSOR);
     drawEditorScreen(&buffer);
@@ -126,7 +142,7 @@ void refreshScreen() {
 }
 
 #define BOTTOM_RIGHT_CURSOR "\x1b[999C\x1b[999B"
-#define BYTE_OUT_BOTTOM_RIGHT_CURSOR 12 // 6 + 6
+#define BYTE_OUT_BOTTOM_RIGHT_CURSOR 12 // \x1b[999C = 6 and \x1b[999B = 6
 #define ASK_CURRENT_CURSOR_POSITION "\x1b[6n"
 #define BYTE_OUT_ASK_CURSOR_POSITION 4
 inline bool askCursorPosition() {
@@ -180,3 +196,11 @@ void verticalScroll() {
         config.scrolling.rowoffset = config.cursorPosition.cy - config.windowXY.screenRows + 1;
 }
 
+void horizontalSroll() {
+    // Scroll to left
+    if(config.cursorPosition.cx < config.scrolling.coloffset)
+        config.scrolling.coloffset = config.cursorPosition.cx;
+    // Scroll to right
+    if(config.cursorPosition.cx >= config.scrolling.coloffset + config.windowXY.screenCols)
+        config.scrolling.coloffset = config.cursorPosition.cx - config.windowXY.screenCols + 1;
+}

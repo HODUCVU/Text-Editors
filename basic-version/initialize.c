@@ -18,7 +18,8 @@
 void initWindowSize() {
     config.cursorPosition.cx = START_X_CURSOR;
     config.cursorPosition.cy = START_Y_CURSOR;
-    config.scrolling.rowoffset = 0;
+    config.scrolling.rowoffset = START_Y_CURSOR;
+    config.scrolling.coloffset = START_X_CURSOR;
     config.erow.numrows = START_NUMBER_OF_ROWS;
     config.erow.row = NULL;
     if((getWindowSize(&config.windowXY)) == SETTING_WINDOW_ERROR)

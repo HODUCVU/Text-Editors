@@ -69,19 +69,15 @@ void processingKeypress() {
             exit(0);
             break;
         case PAGE_UP:
-//             movePage(moveUp);
             config.cursorPosition.cy = 0;
             break;
         case PAGE_DOWN:
-//             movePage(moveDown);
             config.cursorPosition.cy = config.erow.numrows;
             break;
         case HOME_KEY:
-//             moveToEdgesOfScreen(moveLeft);
             config.cursorPosition.cx = 0;
             break;
         case END_KEY:
-//             moveToEdgesOfScreen(moveRight);
             config.cursorPosition.cx = config.erow.row[config.cursorPosition.cy].size - 1;
             break;
         case DELETE_KEY:
@@ -96,7 +92,7 @@ void processingKeypress() {
 }
 inline void cursorAtOutOfLine() {
     if(config.cursorPosition.cx > config.erow.row[config.cursorPosition.cy].size)
-        config.cursorPosition.cx = config.erow.row[config.cursorPosition.cy].size;
+        config.cursorPosition.cx = config.erow.row[config.cursorPosition.cy].size-1;
 }
 inline void moveUp() {
     if(config.cursorPosition.cy > 0) {
