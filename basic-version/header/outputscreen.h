@@ -58,7 +58,7 @@ void writeOutScreen(Abuffer *buffer);
 void newLine(Abuffer *buffer, int row);
 void drawRow(Abuffer *buffer, char* content, int sizeContent);
 int drawTitleEditor(Abuffer *buffer);
-int convertContentWithHorizontalOffset(char *source, int sourceSize, char *destination);
+int convertContentWithHorizontalOffset(int sourceSize);
 void writeContentToRows(Abuffer *buffer, int row) ;
 void drawEditorScreen(Abuffer *buffer);
 

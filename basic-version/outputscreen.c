@@ -77,27 +77,22 @@ inline void newLine(Abuffer *buffer, int row) {
 inline void drawRow(Abuffer *buffer, char* content, int sizeContent) {
     appendBuffer(buffer, content, sizeContent);
 }
-int convertContentWithHorizontalOffset(char *source, int sourceSize, char *destination) {
-    int destSize = 0, horizontalMove = config.scrolling.coloffset;
-    while(horizontalMove < sourceSize && destSize < config.windowXY.screenCols)
-        destination[destSize++] = source[horizontalMove++];
-    destination[destSize] = '\0';
-    return destSize;
+/*
+    source Size                              |----------|
+    coloffset                                |----|
+    horizontal show = sourceSize - coloffset |------|
+    Move with coloffset                      ____|------|
+*/
+int convertContentWithHorizontalOffset(int sourceSize) {
+    sourceSize -= config.scrolling.coloffset;
+    return sourceSize >= 0 ? sourceSize : 0;
 }
-// int test(int *sourceSize) {
-//     sourceSize -= config.scrolling.coloffset;
-//     return sourceSize != 0 ? sourceSize : 0;
-// }
 void writeContentToRows(Abuffer *buffer, int row) {
     int sizeChars = config.erow.row[row].size;
-    // char *contentAtRow = malloc(config.windowXY.screenCols+1);
-    // int contentSizes = convertContentWithHorizontalOffset(config.erow.row[row].chars, sizeChars, contentAtRow);
-    // drawRow(buffer, contentAtRow, contentSizes);
-    // free(contentAtRow);
-
+    sizeChars = convertContentWithHorizontalOffset(sizeChars);
     if(sizeChars > config.windowXY.screenCols) 
         sizeChars = config.windowXY.screenCols;
-    drawRow(buffer, config.erow.row[row].chars[config.scrolling.coloffset], sizeChars);
+    drawRow(buffer, &config.erow.row[row].chars[config.scrolling.coloffset], sizeChars);
 }
 void drawEditorScreen(Abuffer *buffer) {
     int row = drawTitleEditor(buffer);
