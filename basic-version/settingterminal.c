@@ -18,17 +18,18 @@
 void die(const char* s);
 
 /***    Define functions --> Config Terminal    ***/
-void disableRawMode() {
-    if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &config.original_termios) 
-        == SETTING_TERMINAL_ERROR)
-        die("tcsetattr");
-}
 void enableRawMode() {
     if(tcgetattr(STDIN_FILENO, &config.original_termios) == SETTING_TERMINAL_ERROR)
         die("tcgetattr");
     atexit(disableRawMode);
     struct termios raw = setFlagsForRawMode(config.original_termios);
     if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == SETTING_TERMINAL_ERROR)
+        die("tcsetattr");
+}
+
+void disableRawMode() {
+    if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &config.original_termios) 
+        == SETTING_TERMINAL_ERROR)
         die("tcsetattr");
 }
 

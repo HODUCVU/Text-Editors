@@ -9,6 +9,7 @@
 #ifndef _KEYBOARDINPUT_H
 #define _KEYBOARDINPUT_H
 
+#include <stdbool.h>
 /*
    Details in ../docs/keyboardInput.md
 */
@@ -29,26 +30,27 @@ typedef enum {
     PAGE_DOWN,      // ESC[6~
 } ControlKey;
 
+/*
+    Processing Key input from readKeyPress;
+*/
+void processingKeypress();
 int readKeypress();
 /*
     Arrow key up = [ + 'A' -> 2 byte
     '\x1b' is ESC
 */
 int readMoveKey();
-/*
-    Processing Key input from readKeyPress;
-*/
-void processingKeypress();
+int convertArrowOrHomeEndKeyToMoveValue(char key);
+int convertPageMoveOrDeteleInsertKeyToMoveValue(char *key) ;
 /*
     Processing keyword to move cursor by arrows
 */
 void moveCursorByArrows(int arrow);
-int convertArrowOrHomeEndKeyToMoveValue(char key);
-int convertPageMoveOrDeteleInsertKeyToMoveValue(char *key) ;
 void moveLeft();
 void moveRight();
 void moveUp();
 void moveDown();
+bool stillInRowsContainContent();
 void cursorAtOutOfLine();
 
 /***    Test functions      ***/

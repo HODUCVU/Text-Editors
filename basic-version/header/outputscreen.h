@@ -13,6 +13,15 @@
 #include <stdbool.h>
 
 /*
+    Details at ../docs/outputScreen.md
+    lib: <unistd.h>
+    Fuctions used: write() to write on terminal output
+    This function use to erase screen
+
+    cursor: https://vt100.net/docs/vt100-ug/chapter3.html#CUP
+*/
+void eraseEntireScreen();
+/*
     Design a buffer to minimun use write() function -> prevent hiding bugs
     using <string.h> to copy current buffer to new buffer when want to append new character
 */
@@ -23,20 +32,12 @@ typedef struct Abuffer {
 void appendBuffer(Abuffer *buffer, const char* s, int len);
 void freeBuffer(Abuffer *buffer);
 /*
-    Details at ../docs/outputScreen.md
-    lib: <unistd.h>
-    Fuctions used: write() to write on terminal output
-    This function use to erase screen
-
-    cursor: https://vt100.net/docs/vt100-ug/chapter3.html#CUP
-*/
-void eraseEntireScreen();
-/*
     Refresh screen, but still write something on editor
 */
 void refreshScreen();
-void writeOutScreen(Abuffer *buffer);
 
+void verticalScroll();
+void horizontalSroll();
 /*
     Daw a column of tildes (~) like in vim.
     In the future, I will replace this to number column
@@ -55,14 +56,25 @@ void writeOutScreen(Abuffer *buffer);
     + 1 erases the part of the line to the left of the cursor
     + 0 erases the part of the line to the right of the cursor
 */
-void newLine(Abuffer *buffer, int row);
-void drawRow(Abuffer *buffer, char* content, int sizeContent);
-int drawTitleEditor(Abuffer *buffer);
-int convertContentWithHorizontalOffset(int sourceSize);
-void writeContentToRows(Abuffer *buffer, int row) ;
 void drawEditorScreen(Abuffer *buffer);
 
+int drawTitleEditor(Abuffer *buffer);
+void welcomeMessage(Abuffer *buffer);
+int setMessageTitle(char* welcome);
+
+void drawRow(Abuffer *buffer, char* content, int sizeContent);
+
+int convertContentWithHorizontalOffset(int sourceSize);
+void writeContentToRows(Abuffer *buffer, int row) ;
+
+void newLine(Abuffer *buffer, int row);
+
 void moveCursorToCurrentPosition(Abuffer *buffer);
+
+void writeOutScreen(Abuffer *buffer);
+
+
+
 /*
     Build window size of editor
     lib: <sys/ioctl.h>
@@ -100,15 +112,10 @@ int getWindowSize(WindowXY *window);
     -> buffer = '\x1b[y;x'
     -> buffer[1] = '[y;x'
 */
-
+int getCurserPosition(WindowXY *window);
 bool askCursorPosition();
 void readCursorInfoIntoBuffer(char *buffer, int bufferSize);
 int parsePositionFromBuffer(char *buffer, WindowXY *window);
-int getCurserPosition(WindowXY *window);
 
-int setMessageTitle(char* welcome);
-void welcomeMessage(Abuffer *buffer);
 
-void verticalScroll();
-void horizontalSroll();
 #endif

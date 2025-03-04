@@ -31,7 +31,9 @@ typedef struct WindowXY {
 */
 typedef struct Erow {
     int size;
-    char *chars;
+    int renderSize;
+    char *chars; // for content
+    char *render; // for tab
 } Erow;
 typedef struct ConfigERows {
     int numrows;

@@ -30,6 +30,8 @@ void appendRow(char* line, size_t lineLen) {
     config.erow.row[at].chars = malloc(lineLen + 1);
     memcpy(config.erow.row[at].chars, line, lineLen);
     config.erow.row[at].chars[lineLen] = '\0';
+    config.erow.row[at].render = NULL;
+    config.erow.row[at].renderSize = 0;
     config.erow.numrows++;
 }
 inline bool removeEndLine(char* line, ssize_t lineLen) {

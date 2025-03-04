@@ -24,7 +24,7 @@ void processingKeypress();
 
 /*** screen ***/
 void refreshScreen();
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {   
   enableRawMode();
   initWindowSize();
   if(argc >= 2)
