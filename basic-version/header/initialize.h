@@ -9,6 +9,8 @@
 #ifndef _INITEDITOR_H
 #define _INITEDITOR_H
 
-void initWindowSize();
-
+void initEditor();
+void initPosition();
+void initScrolling();
+void initRowsContent();
 #endif

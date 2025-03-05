@@ -14,10 +14,13 @@
 /***        Define attributes       ***/
 /*
     cx and cy are tracking position of current cursor
+    rx used to move in horizontal navigation for tab
 */
 typedef struct CursorPosition {
     int cx, cy;
+    int rx;
 } CursorPostiion;
+
 /*
     Store rows and cols of entire screen
     screenRows and screenCols are position at the end of terminal
@@ -26,29 +29,32 @@ typedef struct WindowXY {
     int screenRows;
     int screenCols;
 } WindowXY;
+
 /*
     Data type for storing a row of text in editor
 */
 typedef struct Erow {
-    int size;
-    int renderSize;
     char *chars; // for content
     char *render; // for tab
+    int size;
+    int renderSize;
 } Erow;
 typedef struct ConfigERows {
+    Erow *erow;
     int numrows;
-    Erow *row;
 } ConfigERows;
+
 typedef struct Scrolling{
     int rowoffset; // for vertical scrolling
     int coloffset; // for horizontal scrolling
 } Scrolling;
+
 struct Config {
+    struct termios original_termios;
+    ConfigERows configErow;
     CursorPostiion cursorPosition;
     WindowXY windowXY;
-    ConfigERows erow;
     Scrolling scrolling;
-    struct termios original_termios;
 };
 
 typedef enum {

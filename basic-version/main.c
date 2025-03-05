@@ -17,16 +17,16 @@
 void enableRawMode();
 
 /***  initialize ***/
-void initWindowSize();
+void initEditor();
 
 /*** keyboard ***/
 void processingKeypress();
 
 /*** screen ***/
 void refreshScreen();
-int main(int argc, char *argv[]) {   
+int main(int argc, char *argv[]) {
   enableRawMode();
-  initWindowSize();
+  initEditor();
   if(argc >= 2)
     openEditor(argv[1]);
   while(1) {

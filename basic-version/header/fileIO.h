@@ -8,7 +8,7 @@
  * ************************/
 #ifndef _FILEIO_H
 #define _FILEIO_H
-
+#include "global.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -17,5 +17,5 @@ void closeFile(FILE **fp) ;
 bool removeEndLine(char* line, ssize_t lineLen);
 void appendRow(char* line, size_t lineLen);
 void openEditor(char *filename);
-
+void updateRowForRender(Erow *row);
 #endif

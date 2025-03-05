@@ -15,13 +15,28 @@
 #define START_X_CURSOR 0
 #define START_Y_CURSOR 0
 #define START_NUMBER_OF_ROWS 0
-void initWindowSize() {
-    config.cursorPosition.cx = START_X_CURSOR;
-    config.cursorPosition.cy = START_Y_CURSOR;
-    config.scrolling.rowoffset = START_Y_CURSOR;
-    config.scrolling.coloffset = START_X_CURSOR;
-    config.erow.numrows = START_NUMBER_OF_ROWS;
-    config.erow.row = NULL;
+
+void initEditor() {
+    initPosition();
+    initScrolling();
+    initRowsContent();
+
     if((getWindowSize(&config.windowXY)) == SETTING_WINDOW_ERROR)
         die("getWindowSize");
+}
+
+void initPosition() {
+    config.cursorPosition.cx = START_X_CURSOR;
+    config.cursorPosition.rx = START_X_CURSOR;
+    config.cursorPosition.cy = START_Y_CURSOR;
+}
+
+void initScrolling() {
+    config.scrolling.coloffset = START_X_CURSOR;
+    config.scrolling.rowoffset = START_Y_CURSOR;
+}
+
+void initRowsContent() {
+    config.configErow.erow = NULL;
+    config.configErow.numrows = START_NUMBER_OF_ROWS;
 }

@@ -34,14 +34,14 @@ void processingKeypress() {
             cursorAtOutOfLine();
             break;
         case PAGE_DOWN:
-            config.cursorPosition.cy = config.erow.numrows-1;
+            config.cursorPosition.cy = config.configErow.numrows-1;
             cursorAtOutOfLine();
             break;
         case HOME_KEY:
             config.cursorPosition.cx = 0;
             break;
         case END_KEY:
-            config.cursorPosition.cx = config.erow.row[config.cursorPosition.cy].size - 1;
+            config.cursorPosition.cx = config.configErow.erow[config.cursorPosition.cy].renderSize - 1;
             break;
     }
 }
@@ -127,12 +127,12 @@ void moveLeft() {
     }
     else if(config.cursorPosition.cy > 0){
         config.cursorPosition.cy--;
-        config.cursorPosition.cx = config.erow.row[config.cursorPosition.cy].size;
+        config.cursorPosition.cx = config.configErow.erow[config.cursorPosition.cy].renderSize;
     }
 }
 void moveRight() {
     if(stillInRowsContainContent()) {
-        if (config.cursorPosition.cx < config.erow.row[config.cursorPosition.cy].size){
+        if (config.cursorPosition.cx < config.configErow.erow[config.cursorPosition.cy].renderSize){
             config.cursorPosition.cx++;
         }
         else {
@@ -142,11 +142,11 @@ void moveRight() {
     }
 }
 inline bool stillInRowsContainContent() {
-    return config.cursorPosition.cy < config.erow.numrows;
+    return config.cursorPosition.cy < config.configErow.numrows;
 }
 void cursorAtOutOfLine() {
-    if(config.cursorPosition.cx > config.erow.row[config.cursorPosition.cy].size)
-        config.cursorPosition.cx = config.erow.row[config.cursorPosition.cy].size-1;
+    if(config.cursorPosition.cx > config.configErow.erow[config.cursorPosition.cy].renderSize)
+        config.cursorPosition.cx = config.configErow.erow[config.cursorPosition.cy].renderSize;
     if(!stillInRowsContainContent())   
         config.cursorPosition.cx = 0;
 }

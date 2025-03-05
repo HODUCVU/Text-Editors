@@ -15,28 +15,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-FILE* readFile(char *filename) {
-    FILE *fp = fopen(filename, "r");
-    if(!fp) die("fopen");
-    return fp;
-}
-inline void closeFile(FILE **fp) {
-    fclose(*fp);
-}
-void appendRow(char* line, size_t lineLen) {
-    config.erow.row = realloc(config.erow.row, sizeof(Erow)*(config.erow.numrows + 1));
-    int at = config.erow.numrows;
-    config.erow.row[at].size = lineLen;
-    config.erow.row[at].chars = malloc(lineLen + 1);
-    memcpy(config.erow.row[at].chars, line, lineLen);
-    config.erow.row[at].chars[lineLen] = '\0';
-    config.erow.row[at].render = NULL;
-    config.erow.row[at].renderSize = 0;
-    config.erow.numrows++;
-}
-inline bool removeEndLine(char* line, ssize_t lineLen) {
-    return lineLen > 0 && (line[lineLen - 1] == '\r' || line[lineLen - 1] == '\n');
-}
 void openEditor(char *filename) {
     FILE *fp = readFile(filename);
     char* line = NULL;
@@ -49,4 +27,57 @@ void openEditor(char *filename) {
     } 
     free(line);
     closeFile(&fp);
+}
+
+FILE* readFile(char *filename) {
+    FILE *fp = fopen(filename, "r");
+    if(!fp) die("fopen");
+    return fp;
+}
+inline void closeFile(FILE **fp) {
+    fclose(*fp);
+}
+
+inline bool removeEndLine(char* line, ssize_t lineLen) {
+    return lineLen > 0 && (line[lineLen - 1] == '\r' || line[lineLen - 1] == '\n');
+}
+
+void appendRow(char* line, size_t lineLen) {
+    config.configErow.erow = realloc(config.configErow.erow, sizeof(Erow)*(config.configErow.numrows + 1));
+    int at = config.configErow.numrows;
+
+    config.configErow.erow[at].size = lineLen;
+    config.configErow.erow[at].chars = malloc(lineLen + 1);
+    memcpy(config.configErow.erow[at].chars, line, lineLen);
+    config.configErow.erow[at].chars[lineLen] = '\0';
+
+    config.configErow.erow[at].render = NULL;
+    config.configErow.erow[at].renderSize = 0;
+    updateRowForRender(&config.configErow.erow[at]);
+
+    config.configErow.numrows++;
+}
+
+// Just copy Erow.chars and convert '\t' to 8 white spaces to fix render tab
+#define TAB_TO_WHITE_SPACE 8
+void updateRowForRender(Erow *row) {
+    int tabs = 0;
+    int idxOfRender = 0;
+
+    for(int idxOfChars = 0; idxOfChars < row->size; idxOfChars++) 
+        if(row->chars[idxOfChars] == '\t') 
+            tabs++;
+    
+    free(row->render);
+    row->render = malloc(row->size + tabs*(TAB_TO_WHITE_SPACE - 1) + 1);
+
+    for(int idxOfChars = 0; idxOfChars < row->size; idxOfChars++) {
+        if(row->chars[idxOfChars] == '\t') {
+            row->render[idxOfRender++] = ' ';
+            while(idxOfRender % TAB_TO_WHITE_SPACE != 0) row->render[idxOfRender++] = ' ';
+        } else
+            row->render[idxOfRender++] = row->chars[idxOfChars];
+    }
+    row->render[idxOfRender] = '\0';
+    row->renderSize = idxOfRender;
 }
